@@ -1,0 +1,6 @@
+*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfvars
+terraform-ec2-key.pem
+.env

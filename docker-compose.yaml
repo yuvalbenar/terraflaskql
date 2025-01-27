@@ -1,0 +1,35 @@
+version: "3.8-slim"
+services:
+  flaskgif:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flaskgif
+    ports:
+      - "5000:5000"
+    depends_on:
+      - gif-db
+    networks:
+      - flaskapp-network
+    env_file:
+      - .env
+
+  gif-db:
+    image: mysql:5.7
+    container_name: gif-db
+    ports:
+      - "3308:3306"
+    networks:
+      - flaskapp-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    env_file:
+      - .env
+
+networks:
+  flaskapp-network:
+    driver: bridge  # Define the network with a driver (bridge is common for local setups)
+
+volumes:
+  mysql-data:  # Ensure the volume is also defined if you plan to persist MySQL data

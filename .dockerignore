@@ -1,0 +1,13 @@
+**/__pycache__/
+*.pyc
+*.pyo
+.env
+*.env
+*.pem
+terraform.tfstate
+terraform.tfstate.*
+*.tfstate
+*.tfstate.*
+.terraform/
+.dockerignore
+Dockerfile
