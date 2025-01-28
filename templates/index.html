@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beagle of the Day</title>
+    <style>
+        body {
+            background-color: black;  /* Set background color to black */
+            color: white;             /* Set text color to white for better contrast */
+            display: flex;            /* Use flexbox to center the content */
+            justify-content: center;  /* Horizontally center the content */
+            align-items: center;      /* Vertically center the content */
+            height: 100vh;            /* Make the body take the full height of the viewport */
+            margin: 0;                /* Remove default margin */
+            font-family: Arial, sans-serif; /* Optional: set a nice font */
+        }
+
+
+        h1 {
+            font-size: 2rem;          /* Optional: Increase the size of the heading */
+            margin-bottom: 20px;      /* Space between the heading and gif */
+        }
+
+
+        img {
+            max-width: 90%;           /* Ensure the gif is responsive and doesn't overflow */
+            height: auto;             /* Keep the aspect ratio of the gif */
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Beagle of the Day</h1>
+        <img src="{{ image }}" alt="Beagle of the Day">
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Image Gallery</title>
+</head>
+<body>
+    <h1>Flask Image Gallery</h1>
+   
+    <!-- Loop through the images and display each one -->
+    {% for image in images %}
+        <div>
+            <img src="{{ image[0] }}" alt="Image" style="max-width: 500px;">
+        </div>
+    {% endfor %}
+</body>
+</html> -->
+
+
+
+
+<!-- <html>
+  <head>
+    <style type="text/css">
+      body {
+        background: black;
+        color: white;
+      }
+      div.container {
+        max-width: 500px;
+        margin: 100px auto;
+        border: 20px solid white;
+        padding: 10px;
+        text-align: center;
+      }
+      h4 {
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h4>Beagle of the day!</h4>
+      <img src="{{url}}" />
+      <p><small>Courtesy: <a href="https://tenor.com/search/beagles-gifs">tenor</a></small></p>
+    </div>
+  </body>
+</html> -->

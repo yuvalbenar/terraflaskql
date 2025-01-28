@@ -1,4 +1,4 @@
-version: "3.8-slim"
+version: '3.8'
 services:
   flaskgif:
     build:
