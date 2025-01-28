@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.8'  #actaullyworks! first version using terraform on aws without cicd and k8s, tommarow we tackle the pipeline!
 services:
   flaskgif:
     build:
