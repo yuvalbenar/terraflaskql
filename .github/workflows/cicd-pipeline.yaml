@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - cicd-pipelines  # Trigger on pushes to the specified branch
+      - cicd-pipelines  # Trigger on pushes to the specified branch boyyy
 
 jobs:
   build-Test:
