@@ -183,4 +183,4 @@ jobs:
               docker --version
               docker-compose --version
               docker-compose up -d --quiet-pull
-EOF
+              << EOF
