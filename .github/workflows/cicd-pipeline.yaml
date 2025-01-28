@@ -21,7 +21,7 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "IMAGE_NAME=yuvalbenar/flasksqlgifbase" >> $GITHUB_ENV
-          echo "IMAGE_TAG=0.0.${{ github.run_number }}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=v1.0.83" >> $GITHUB_ENV   # Changed to v1.0.83
           echo "FLASK_ENV=${{ secrets.FLASK_ENV }}" >> $GITHUB_ENV
           echo "MYSQL_HOST=${{ secrets.DATABASE_HOST }}" >> $GITHUB_ENV
           echo "MYSQL_USER=${{ secrets.DATABASE_USER }}" >> $GITHUB_ENV
@@ -119,6 +119,7 @@ jobs:
                       --query 'Reservations[0].Instances[0].PublicIpAddress' \
                       --output text)
                   
+
           echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
 
       - name: Check SSH Connection Status
@@ -148,7 +149,7 @@ jobs:
       - name: Generate .env File for EC2 Instance Variables
         run: |
           echo "IMAGE_NAME=yuvalbenar/flasksqlgifbase" > .env
-          echo "IMAGE_TAG=latest" >> .env
+          echo "IMAGE_TAG=v1.0.83" >> .env   # Changed to v1.0.83
           echo "FLASK_ENV=${{ secrets.FLASK_ENV }}" >> .env
           echo "MYSQL_HOST=${{ secrets.DATABASE_HOST }}" >> .env
           echo "MYSQL_USER=${{ secrets.DATABASE_USER }}" >> .env
@@ -183,4 +184,4 @@ jobs:
               docker --version
               docker-compose --version
               docker-compose up -d --quiet-pull
-              << EOF
+EOF
