@@ -100,7 +100,7 @@ jobs:
             --image-id ami-01816d07b1128cd2d \
             --instance-type t2.micro \
             --key-name ${{ secrets.EC2_KEY_NAME }} \
-            --security-groups sg-03b6ef8ea1469d825 \
+            --security-group-ids sg-03b6ef8ea1469d825 \
             --iam-instance-profile Arn=arn:aws:iam::941377133990:instance-profile/access-to-s3 \
             --user-data '#!/bin/bash
             yum update -y
