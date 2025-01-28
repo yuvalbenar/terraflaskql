@@ -43,7 +43,7 @@ jobs:
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
         working-directory: /home/runner/work/terraflaskql/terraflaskql
 
-      - name: Verify File Placement
+      - name: Verify `.env` File
         run: |
           ls -la
           cat .env
@@ -63,16 +63,13 @@ jobs:
           docker compose up -d
           sleep 5
           docker compose ps
-
-      - name: Run Docker Compose
-        run: |
-          docker compose up -d
         working-directory: /home/runner/work/terraflaskql/terraflaskql
 
       - name: Test Application
         run: |
           docker compose logs
           curl -f http://localhost:${{ secrets.PORT }}
+        working-directory: /home/runner/work/terraflaskql/terraflaskql
 
   deploy:
     runs-on: ubuntu-latest
@@ -137,7 +134,7 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Generate .env File
+      - name: Generate .env File for EC2
         run: |
           echo "IMAGE_NAME=${{ env.IMAGE_NAME }}" > .env
           echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> .env
@@ -160,4 +157,4 @@ jobs:
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ env.PUBLIC_IP }} << EOF
             cd /home/ec2-user
             docker-compose up -d --quiet-pull
-            >> EOF
+            >>EOF
