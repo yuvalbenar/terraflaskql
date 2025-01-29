@@ -171,4 +171,4 @@ jobs:
           -var "database_host=${{ secrets.DATABASE_HOST }}" \
           -var "flask_env=${{ secrets.FLASK_ENV }}" \
           -var "image_tag=${{ env.IMAGE_TAG }}"
-        working-directory: C:/Users/yuval/terraflaskql  # Adjust path to the folder containing your .tf files
+        working-directory: ./terraflaskql
