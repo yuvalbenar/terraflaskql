@@ -43,12 +43,6 @@ jobs:
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
         working-directory: /home/runner/work/terraflaskql/terraflaskql
 
-      - name: Verify `.env` File
-        run: |
-          ls -la
-          cat .env
-        working-directory: /home/runner/work/terraflaskql/terraflaskql
-
       - name: Build and Tag Docker Image
         run: |
           docker build -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} . 
@@ -93,77 +87,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy EC2 Instance
-        run: |
-          INSTANCE_ID=$(aws ec2 run-instances \
-            --region us-east-1 \
-            --image-id ami-01816d07b1128cd2d \
-            --instance-type t2.micro \
-            --key-name ${{ secrets.EC2_KEY_NAME }} \
-            --security-group-ids sg-03b6ef8ea1469d825 \
-            --iam-instance-profile Arn=arn:aws:iam::941377133990:instance-profile/access-to-s3 \
-            --user-data '#!/bin/bash
-            yum update -y
-            yum install -y docker
-            systemctl start docker
-            systemctl enable docker
-            usermod -aG docker ec2-user  # Add ec2-user to docker group
-            curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose' \
-            --query 'Instances[0].InstanceId' \
-            --output text)
-
-          echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
-          aws ec2 wait instance-running --instance-ids $INSTANCE_ID
-          PUBLIC_IP=$(aws ec2 describe-instances \
-            --instance-ids $INSTANCE_ID \
-            --query 'Reservations[0].Instances[0].PublicIpAddress' \
-            --output text)
-          echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
-
-      - name: Wait for SSH Access
-        run: |
-          while ! nc -z ${{ env.PUBLIC_IP }} 22; do
-            echo "Waiting for SSH..."
-            sleep 5
-          done
-
-      - name: Setup SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Start SSH Agent and Add Key
-        run: |
-          eval $(ssh-agent -s)
-          ssh-add ~/.ssh/id_rsa
-
-      - name: Generate .env File for EC2
-        run: |
-          echo "IMAGE_NAME=${{ env.IMAGE_NAME }}" > .env
-          echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> .env
-          echo "FLASK_ENV=${{ secrets.FLASK_ENV }}" >> .env
-          echo "MYSQL_HOST=${{ secrets.DATABASE_HOST }}" >> .env
-          echo "MYSQL_USER=${{ secrets.DATABASE_USER }}" >> .env
-          echo "MYSQL_DATABASE=${{ secrets.DATABASE_NAME }}" >> .env
-          echo "PORT=${{ secrets.PORT }}" >> .env
-          echo "MYSQL_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
-          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-
-      - name: Copy Files to EC2
-        run: |
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
-            docker-compose.yaml .env \
-            ec2-user@${{ env.PUBLIC_IP }}:/home/ec2-user/
-
-      - name: Run Application on EC2
-        run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ env.PUBLIC_IP }} << EOF
-            cd /home/ec2-user
-            docker-compose up -d --quiet-pull
-            >>EOF
-
       - name: Terraform Apply
         run: terraform apply -auto-approve \
           -var "mysql_root_password=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
@@ -171,4 +94,26 @@ jobs:
           -var "database_host=${{ secrets.DATABASE_HOST }}" \
           -var "flask_env=${{ secrets.FLASK_ENV }}" \
           -var "image_tag=${{ env.IMAGE_TAG }}"
-        working-directory: ./terraflaskql  # Use the correct relative path to your Terraform files
+
+      - name: Retrieve Public IP
+        id: ip
+        run: echo "::set-output name=public_ip::$(terraform output -raw public_ip)"
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Copy Files to EC2
+        run: |
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            docker-compose.yaml .env \
+            ec2-user@${{ steps.ip.outputs.public_ip }}:/home/ec2-user/
+
+      - name: Run Application on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ steps.ip.outputs.public_ip }} << EOF
+            cd /home/ec2-user
+            docker-compose up -d --quiet-pull
+            >>EOF
