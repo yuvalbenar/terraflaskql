@@ -89,11 +89,7 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve \
-          -var "mysql_root_password=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
-          -var "mysql_database=${{ secrets.DATABASE_NAME }}" \
-          -var "database_host=${{ secrets.DATABASE_HOST }}" \
-          -var "flask_env=${{ secrets.FLASK_ENV }}" \
-          -var "image_tag=${{ env.IMAGE_TAG }}"
+       
 
       - name: Retrieve Public IP
         id: ip
