@@ -109,11 +109,11 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Copy Files to EC2
+       - name: Copy Files to EC2
         run: |
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
             docker-compose.yaml .env \
-            ec2-user@${{ steps.ip.outputs.public_ip }}:/home/ec2-user/
+            ec2-user@${{ env.PUBLIC_IP }}:/home/ec2-user/
 
       - name: Run Application on EC2
         run: |
