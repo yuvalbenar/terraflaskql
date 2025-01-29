@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - cicd-pipelines  # Trigger on pushes to the specified branch boyyy
+      - cicd-pipelines  # Trigger on pushes to the specified branch
 
 jobs:
   build-Test:
@@ -165,4 +165,9 @@ jobs:
             >>EOF
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file=terraform.tfvars
+        run: terraform apply -auto-approve \
+          -var "mysql_root_password=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
+          -var "mysql_database=${{ secrets.DATABASE_NAME }}" \
+          -var "database_host=${{ secrets.DATABASE_HOST }}" \
+          -var "flask_env=${{ secrets.FLASK_ENV }}" \
+          -var "image_tag=${{ env.IMAGE_TAG }}"
