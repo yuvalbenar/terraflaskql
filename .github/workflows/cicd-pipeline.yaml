@@ -91,8 +91,8 @@ jobs:
         env:
           TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           TF_VAR_mysql_database: ${{ secrets.MYSQL_DATABASE }}
-          TF_VAR_mysql_user: ${{ secrets.MYSQL_USER }}
-          TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
+          TF_VAR_mysql_user: ${{ secrets.DATABASE_USER }}
+          TF_VAR_mysql_password: ${{ secrets.DATABASE_PASSWORD }}
           TF_VAR_database_host: ${{ secrets.DATABASE_HOST }}
           TF_VAR_port: ${{ secrets.PORT }}
           TF_VAR_flask_env: ${{ secrets.FLASK_ENV }}
@@ -101,7 +101,7 @@ jobs:
 
       - name: Retrieve Public IP
         id: ip
-        run: echo "::set-output name=public_ip::$(terraform output -raw public_ip)"
+        run: echo "public_ip=$(terraform output -raw public_ip)" >> $GITHUB_ENV
 
       - name: Setup SSH Key
         run: |
@@ -113,11 +113,11 @@ jobs:
         run: |
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
             docker-compose.yaml .env \
-            ec2-user@${{ env.PUBLIC_IP }}:/home/ec2-user/
+            ec2-user@${{ env.public_ip }}:/home/ec2-user/
 
       - name: Run Application on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ steps.ip.outputs.public_ip }} << EOF
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ env.public_ip }} << EOF
             cd /home/ec2-user
             docker-compose up -d --quiet-pull
             >>EOF
