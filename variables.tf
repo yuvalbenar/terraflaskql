@@ -25,7 +25,7 @@ variable "database_host" {
   type        = string
 }
 
-variable "database_port" {
+variable "port" {
   description = "The port for the MySQL database"
   type        = number
 }
