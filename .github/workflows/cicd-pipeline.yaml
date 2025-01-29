@@ -99,34 +99,4 @@ jobs:
           TF_VAR_image_tag: ${{ secrets.IMAGE_TAG }}
         run: terraform apply -auto-approve
 
-      - name: Set Public IP Environment Variable
-        run: echo "public_ip=$(terraform output -raw instance_public_ip)" >> $GITHUB_ENV
-        shell: /usr/bin/bash -e {0}
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Setup SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Test SSH Connection
-        run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ env.public_ip }} "echo 'SSH connection successful'"
-
-      - name: Copy Files to EC2 Instance
-        run: |
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
-            docker-compose.yaml .env \
-            ec2-user@${{ env.public_ip }}:/home/ec2-user/
-
-      - name: Run Application on EC2
-        run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@${{ env.public_ip }} << EOF
-            cd /home/ec2-user
-            docker-compose up -d --quiet-pull
-            >>EOF
+      
