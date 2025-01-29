@@ -88,8 +88,16 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve \
-       
+        env:
+          TF_VAR_mysql_root_password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          TF_VAR_mysql_database: ${{ secrets.MYSQL_DATABASE }}
+          TF_VAR_mysql_user: ${{ secrets.MYSQL_USER }}
+          TF_VAR_mysql_password: ${{ secrets.MYSQL_PASSWORD }}
+          TF_VAR_database_host: ${{ secrets.DATABASE_HOST }}
+          TF_VAR_database_port: ${{ secrets.DATABASE_PORT }}
+          TF_VAR_flask_env: ${{ secrets.FLASK_ENV }}
+          TF_VAR_image_tag: ${{ secrets.IMAGE_TAG }}
+        run: terraform apply -auto-approve
 
       - name: Retrieve Public IP
         id: ip
